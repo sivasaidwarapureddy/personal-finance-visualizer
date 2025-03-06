@@ -18,7 +18,7 @@ export default function App() {
 const fetchTransactions = async () => {
   setLoading(true);
   try {
-    const res = await fetch("http://localhost:3333/api/transactions");
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`);
     if (!res.ok) throw new Error("Failed to fetch transactions");
     
     const data = await res.json();
@@ -37,7 +37,8 @@ useEffect(() => {
   
 const addTransaction = async (transaction) => {
   try {
-    const res = await fetch("http://localhost:3333/api/transactions", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`,
+     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(transaction),
@@ -54,7 +55,8 @@ const addTransaction = async (transaction) => {
 
   const deleteTransaction = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3333/api/transactions/${id}`, {
+      const API_URL = import.meta.env.VITE_API_URL;
+      const res = await fetch(`${API_URL}/api/transactions/${id}`, { 
         method: "DELETE",
       });
 
