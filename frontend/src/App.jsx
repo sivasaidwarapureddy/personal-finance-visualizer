@@ -7,56 +7,49 @@ import Layout from "./Layout.jsx";
 
 export default function App() {
   const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch transactions on mount
+  // Backend URL from environment variable
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  const fetchTransactions = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/transactions`);
+      if (!res.ok) throw new Error("Failed to fetch transactions");
+
+      const data = await res.json();
+      setTransactions(data);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchTransactions();
   }, []);
 
-  const [loading, setLoading] = useState(true);
+  const addTransaction = async (transaction) => {
+    try {
+      const res = await fetch(`${API_URL}/api/transactions`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(transaction),
+      });
 
-const fetchTransactions = async () => {
-  setLoading(true);
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`);
-    if (!res.ok) throw new Error("Failed to fetch transactions");
-    
-    const data = await res.json();
-    setTransactions(data);
-  } catch (error) {
-    console.error("Error fetching transactions:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+      if (!res.ok) throw new Error("Failed to add transaction");
 
-useEffect(() => {
-  fetchTransactions();
-}, []);
-
-  
-const addTransaction = async (transaction) => {
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/transactions`,
-     {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(transaction),
-    });
-
-    if (!res.ok) throw new Error("Failed to add transaction");
-
-    await fetchTransactions(); // 🔄 Refresh full list
-  } catch (error) {
-    console.error("Error adding transaction:", error);
-  }
-};
-
+      await fetchTransactions(); // 🔄 Refresh full list
+    } catch (error) {
+      console.error("Error adding transaction:", error);
+    }
+  };
 
   const deleteTransaction = async (id) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL;
-      const res = await fetch(`${API_URL}/api/transactions/${id}`, { 
+      const res = await fetch(`${API_URL}/api/transactions/${id}`, {
         method: "DELETE",
       });
 
@@ -77,9 +70,8 @@ const addTransaction = async (transaction) => {
               <TransactionForm addTransaction={addTransaction} />
             </div>
             <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
-              {/* Pass transactions & fetch function as props */}
-              <TransactionList 
-                transactions={transactions} 
+              <TransactionList
+                transactions={transactions}
                 fetchTransactions={fetchTransactions}
                 deleteTransaction={deleteTransaction}
               />

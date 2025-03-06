@@ -5,7 +5,8 @@ const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-app.use(cors({ origin: "https://personal-finance-visualizer-alpha.vercel.app/" }));
+app.use(cors({ origin: "*" }));
+
 
 
 mongoose.connect(process.env.MONGO_URI )
@@ -13,7 +14,7 @@ mongoose.connect(process.env.MONGO_URI )
   .catch(err => console.error(err));
 
 app.use('/api/transactions', require('./routes/Transactions'));
-// app.use('/api/budget', require('./routes/Budget'));
+
 
 app.get('/', (req, res) => {
   res.send('Hello World');
